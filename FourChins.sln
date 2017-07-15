@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26430.14
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "4Chins", "ConsoleApp1\4Chins.csproj", "{720B831A-908C-4A5A-9BEC-71AE41C4C959}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FourChins", "FourChins\FourChins.csproj", "{720B831A-908C-4A5A-9BEC-71AE41C4C959}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "4ChinsTest", "4ChinsTest\4ChinsTest.csproj", "{6AA26004-E680-4EC8-8078-84B1B6781819}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FourChinsTest", "FourChinsTest\FourChinsTest.csproj", "{6AA26004-E680-4EC8-8078-84B1B6781819}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

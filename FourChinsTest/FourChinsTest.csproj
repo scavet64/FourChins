@@ -55,7 +55,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ConsoleApp1\4Chins.csproj">
+    <ProjectReference Include="..\FourChins\FourChins.csproj">
       <Project>{720b831a-908c-4a5a-9bec-71ae41c4c959}</Project>
       <Name>4Chins</Name>
     </ProjectReference>
