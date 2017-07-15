@@ -14,8 +14,11 @@ namespace FourChins
     public class HTTPUtil
     {
 
+        /// <summary>
+        /// The amount of time since out last API call needs to be tracked. Since this uses the 4chan
+        /// API, we must follow the rules. Every API call must be at least 1 second apart to reduce spam.
+        /// </summary>
         private static DateTime timeSinceLastAPICall = DateTime.UtcNow;
-
         private static TimeSpan waitInterval = new TimeSpan(0, 0, 1);
 
         internal static T DownloadObject<T>(string url)

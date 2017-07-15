@@ -118,5 +118,101 @@ namespace FourChins.Properties {
                 this["NumberOfCoinsAwarded"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("5")]
+        public double DoubleAward {
+            get {
+                return ((double)(this["DoubleAward"]));
+            }
+            set {
+                this["DoubleAward"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("20")]
+        public double TripsAward {
+            get {
+                return ((double)(this["TripsAward"]));
+            }
+            set {
+                this["TripsAward"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("100")]
+        public double QuadsAward {
+            get {
+                return ((double)(this["QuadsAward"]));
+            }
+            set {
+                this["QuadsAward"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("250")]
+        public double QuintsAward {
+            get {
+                return ((double)(this["QuintsAward"]));
+            }
+            set {
+                this["QuintsAward"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("500")]
+        public double sextupleAward {
+            get {
+                return ((double)(this["sextupleAward"]));
+            }
+            set {
+                this["sextupleAward"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("750")]
+        public double septupleAward {
+            get {
+                return ((double)(this["septupleAward"]));
+            }
+            set {
+                this["septupleAward"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1000")]
+        public double octupleAward {
+            get {
+                return ((double)(this["octupleAward"]));
+            }
+            set {
+                this["octupleAward"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool Awarding {
+            get {
+                return ((bool)(this["Awarding"]));
+            }
+            set {
+                this["Awarding"] = value;
+            }
+        }
     }
 }

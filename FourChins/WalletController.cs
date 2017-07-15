@@ -18,9 +18,9 @@ namespace FourChins
         /// <param name="postNumber">post that is awarded</param>
         /// <param name="url">URL of bot's hosted wallet</param>
         /// <returns></returns>
-        public static string SendAwardToWallet(string walletAddress, double amount, string postNumber, string url)
+        public static string SendAwardToWallet(string walletAddress, double amount, int postNumber, string url)
         {
-            string jsonToSend = "{\"method\": \"sendtoaddress\", \"params\":[\"" + walletAddress + "\"," + amount.ToString() + ",\"A tip for post #" + postNumber + ".\"]}";
+            string jsonToSend = "{\"method\": \"sendtoaddress\", \"params\":[\"" + walletAddress + "\"," + amount.ToString() + ",\"A tip for post #" + postNumber.ToString() + ".\"]}";
             return HTTPUtil.PostJsonString(Properties.Settings.Default.WalletServerUsername, Properties.Settings.Default.WalletServerPassword, url, jsonToSend);
         }
     }

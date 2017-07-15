@@ -17,8 +17,6 @@ namespace FourChins
         private static HashSet<string> walletsFound;
         private static HashSet<Post> postsAwarded;
         private static int numberOfCoinsAwarded;
-
-        //unused as of now
         private static Dictionary<string, double> walletToEarnedCoinsMap;
         private static List<AwardedPost> awardedPostsList;
 
@@ -91,7 +89,7 @@ namespace FourChins
                     {
                         //get the full details about the thread
                         Thread fullThread = FourChinCore.GetThread(board, thread.ThreadNumber);
-                        WriteToLog("Parsing Thread: " + thread.ThreadNumber + " - Board: " + board);
+                        WriteToLog(string.Format("Parsing Thread: {0} - Board: {1}", thread.ThreadNumber, board));
 
                         foreach (Post post in fullThread.Posts)
                         {
@@ -110,7 +108,7 @@ namespace FourChins
                     }
                     else
                     {
-                        WriteToLog("Thread has been parsed already");
+                        WriteToLog(string.Format("Thread [{0}] has been parsed already", thread.ThreadNumber));
                     }
                 }
             }
@@ -168,24 +166,31 @@ namespace FourChins
                     break;
                 case 2:
                     WriteToLog("Dubs - " + walletAddress);
+                    AwardPost(walletAddress, postNumber, settings.DoubleAward);
                     break;
                 case 3:
                     WriteToLog("Trips - " + walletAddress);
+                    AwardPost(walletAddress, postNumber, settings.TripsAward);
                     break;
                 case 4:
                     WriteToLog("Quads - " + walletAddress);
+                    AwardPost(walletAddress, postNumber, settings.QuadsAward);
                     break;
                 case 5:
                     WriteToLog("quintuple - " + walletAddress);
+                    AwardPost(walletAddress, postNumber, settings.QuintsAward);
                     break;
                 case 6:
                     WriteToLog("sextuple - " + walletAddress);
+                    AwardPost(walletAddress, postNumber, settings.sextupleAward);
                     break;
                 case 7:
                     WriteToLog("septuple - " + walletAddress);
+                    AwardPost(walletAddress, postNumber, settings.septupleAward);
                     break;
                 case 8:
                     WriteToLog("octuple - " + walletAddress);
+                    AwardPost(walletAddress, postNumber, settings.octupleAward);
                     break;
                 case 9:
                     WriteToLog("nonuple - " + walletAddress);
@@ -220,10 +225,21 @@ namespace FourChins
         /// <param name="wallet">Wallet we are sending the coins to</param>
         /// <param name="postnumber">The post number that is getting the award</param>
         /// <param name="amount">the amount of coins we are sending</param>
-        private static void AwardPost(string wallet, string postnumber, double amount)
+        private static void AwardPost(string wallet, int postnumber, double amount)
         {
-            //walletToEarnedCoinsMap.Add(wallet, amount);
-            WalletController.SendAwardToWallet(wallet, amount, postnumber, BuildURL());
+            walletToEarnedCoinsMap.Add(wallet, amount);
+            settings.NumberOfCoinsAwarded += amount;
+
+            if (settings.Awarding)
+            {
+                logger.Info(string.Format("Awarding wallet: {0} - with {1} Chancoins for post: {2}", wallet, amount, postnumber));
+                WalletController.SendAwardToWallet(wallet, amount, postnumber, BuildURL());
+            }
+            else
+            {
+                logger.Info("Skipping award");
+            }
+            
         }
 
         /// <summary>
