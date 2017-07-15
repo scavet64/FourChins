@@ -1,9 +1,11 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -73,6 +75,29 @@ namespace FourChins
                 timeSinceLastAPICall = DateTime.UtcNow;
                 return Encoding.UTF8.GetString(array, 0, array.Length);
             }
+        }
+
+        public static string PostJsonString(string username, string password, string url, string data)
+        {
+            string result;
+            var httpWebRequest = (HttpWebRequest)WebRequest.Create(url);
+            httpWebRequest.ContentType = "application/json-rpc";
+            httpWebRequest.Method = "POST";
+            httpWebRequest.Credentials = new NetworkCredential(username, password);
+
+            using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
+            {
+                streamWriter.Write(data);
+                streamWriter.Flush();
+                streamWriter.Close();
+            }
+
+            var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
+            using (var streamReader = new StreamReader(httpResponse.GetResponseStream()))
+            {
+                result = streamReader.ReadToEnd();
+            }
+            return result;
         }
     }
 }

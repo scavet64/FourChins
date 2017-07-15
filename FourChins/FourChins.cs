@@ -17,7 +17,7 @@ namespace FourChins
         private static HashSet<string> walletsFound;
         private static HashSet<Post> postsAwarded;
         private static int numberOfCoinsAwarded;
-        private static Dictionary<string, int> walletToEarnedCoinsMap;
+        private static Dictionary<string, double> walletToEarnedCoinsMap;
         private static List<AwardedPost> awardedPostsList;
 
         public FourChins()
@@ -42,6 +42,11 @@ namespace FourChins
 
         public void DoTheThing()
         {
+            ////////////////////////////////////////////
+            //Test Code
+            //AwardPost("CdEG5wxA93h7jj2BjBunLWgZy1pdfPoHAN", "22323232", 0.1);
+            ////////////////////////////////////////////
+
             WriteToLog("Starting up");
             logger.Info("Starting up");
             BoardRootObject BoardsRootObject = FourChinCore.GetBoard();
@@ -176,6 +181,19 @@ namespace FourChins
                     WriteToLog("Error");
                     break;
             }
+        }
+
+        private static void AwardPost(string wallet, string postnumber, double amount)
+        {
+            //walletToEarnedCoinsMap.Add(wallet, amount);
+            WalletController.SendAwardToWallet(wallet, amount, postnumber, BuildURL());
+        }
+
+        private static string BuildURL()
+        {
+            var properties = Properties.Settings.Default;
+            string url = string.Format("http://{0}:{1}", properties.WalletServerAddress, properties.WalletServerPort);
+            return url;
         }
 
         private static void WriteToLog(string message)

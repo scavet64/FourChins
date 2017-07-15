@@ -85,19 +85,19 @@ namespace FourChins.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("username")]
-        public string WallerServerUsername {
+        [global::System.Configuration.DefaultSettingValueAttribute("username33")]
+        public string WalletServerUsername {
             get {
-                return ((string)(this["WallerServerUsername"]));
+                return ((string)(this["WalletServerUsername"]));
             }
             set {
-                this["WallerServerUsername"] = value;
+                this["WalletServerUsername"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("password")]
+        [global::System.Configuration.DefaultSettingValueAttribute("password33")]
         public string WalletServerPassword {
             get {
                 return ((string)(this["WalletServerPassword"]));

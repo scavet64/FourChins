@@ -17,11 +17,11 @@
     <Setting Name="WalletServerPort" Type="System.String" Scope="User">
       <Value Profile="(Default)">43814</Value>
     </Setting>
-    <Setting Name="WallerServerUsername" Type="System.String" Scope="User">
-      <Value Profile="(Default)">username</Value>
+    <Setting Name="WalletServerUsername" Type="System.String" Scope="User">
+      <Value Profile="(Default)">username33</Value>
     </Setting>
     <Setting Name="WalletServerPassword" Type="System.String" Scope="User">
-      <Value Profile="(Default)">password</Value>
+      <Value Profile="(Default)">password33</Value>
     </Setting>
   </Settings>
 </SettingsFile>
