@@ -32,7 +32,7 @@ namespace FourChins
 
             do
             {
-                DoTheThing();
+                StartRunningBot();
 
                 logger.Info("Sleeping for: " + waitTimeMS + "ms");
                 WriteToLog("Sleeping for: " + waitTimeMS + "ms");
@@ -40,7 +40,10 @@ namespace FourChins
             } while (true);
         }
 
-        public void DoTheThing()
+        /// <summary>
+        /// Gets all of the boards
+        /// </summary>
+        public void StartRunningBot()
         {
             ////////////////////////////////////////////
             //Test Code
@@ -62,6 +65,14 @@ namespace FourChins
             Properties.Settings.Default.Save();
         }
 
+        /// <summary>
+        /// Main method that will parse the board for any gets.
+        /// Starts by collecting all of the threads on the board at this time. For each thread, if
+        /// the last modified date is more recent than the previous run, request the posts for that thread.
+        /// Iterate through the posts looking for posters that have the correct $4CHN: prefix. If they do,
+        /// check for a get. Award the user if they got a get.
+        /// </summary>
+        /// <param name="board"></param>
         public static void ParseBoard(string board)
         {
             //get all the threads from the passed in board
@@ -100,11 +111,21 @@ namespace FourChins
             }
         }
 
+        /// <summary>
+        /// Simple algorithm that checks a post number for any consecutive final digits.
+        /// </summary>
+        /// <param name="postNumber">Post number to check</param>
+        /// <returns>returns the number of consecutive final digits</returns>
         public static int GetTheGet(int postNumber)
         {
             return GetTheGet(postNumber.ToString());
         }
 
+        /// <summary>
+        /// Simple algorithm that checks a post number for any consecutive final digits.
+        /// </summary>
+        /// <param name="postNumber">Post number to check</param>
+        /// <returns>returns the number of consecutive final digits</returns>
         public static int GetTheGet(string postNumber)
         {
             int iterations = 0;
@@ -128,6 +149,11 @@ namespace FourChins
             return iterations;
         }
 
+        /// <summary>
+        /// Checks to see if the post was a Get. If there was a successfull get, we send the coins.
+        /// </summary>
+        /// <param name="postNumber">Post number to check</param>
+        /// <param name="walletAddress">Address to send the coins to if successful</param>
         private static void CheckAndHandleGet(int postNumber, string walletAddress)
         {
             switch (GetTheGet(postNumber))
@@ -183,12 +209,22 @@ namespace FourChins
             }
         }
 
+        /// <summary>
+        /// Wrapper method that handles the awarding of posts. This can be expanded to keep track of more data
+        /// </summary>
+        /// <param name="wallet">Wallet we are sending the coins to</param>
+        /// <param name="postnumber">The post number that is getting the award</param>
+        /// <param name="amount">the amount of coins we are sending</param>
         private static void AwardPost(string wallet, string postnumber, double amount)
         {
             //walletToEarnedCoinsMap.Add(wallet, amount);
             WalletController.SendAwardToWallet(wallet, amount, postnumber, BuildURL());
         }
 
+        /// <summary>
+        /// Builds the URL using the settings file
+        /// </summary>
+        /// <returns>String URL</returns>
         private static string BuildURL()
         {
             var properties = Properties.Settings.Default;
@@ -196,8 +232,13 @@ namespace FourChins
             return url;
         }
 
+        /// <summary>
+        /// This currently writes to the console and a txt file where the exe is located.
+        /// </summary>
+        /// <param name="message">Message to log</param>
         private static void WriteToLog(string message)
         {
+            logger.Info(message);
             Console.WriteLine(DateTime.UtcNow + ": " + message);
         }
     }
