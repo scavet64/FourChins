@@ -1,4 +1,5 @@
 ﻿using FChan.Library;
+using FourChins.Model;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -10,18 +11,22 @@ namespace FourChins
 {
     public class FourChins
     {
-        private static UInt64 lastRun = 0;
-        private static ConcurrentBag<string> walletsFound;
-        private static ConcurrentBag<Post> postsAwarded;
+        private static ulong lastRun = 0;
+        private static HashSet<string> walletsFound;
+        private static HashSet<Post> postsAwarded;
         private static int numberOfCoinsAwarded;
+        private static Dictionary<string, int> walletToEarnedCoinsMap;
+        private static List<AwardedPost> awardedPostsList;
 
         public FourChins()
         {
-            walletsFound = new ConcurrentBag<string>();
-            postsAwarded = new ConcurrentBag<Post>();
+            walletsFound = new HashSet<string>();
+            postsAwarded = new HashSet<Post>();
+            awardedPostsList = new List<AwardedPost>();
             numberOfCoinsAwarded = 0;
 
             int waitTimeMS = Properties.Settings.Default.WaitTimeMS;
+            lastRun = Properties.Settings.Default.LastRun;
 
             do
             {
@@ -43,7 +48,9 @@ namespace FourChins
                 ParseBoard(board.BoardName);
             }
 
-            lastRun = (UInt64)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+            lastRun = (ulong)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+            Properties.Settings.Default.LastRun = lastRun;
+            Properties.Settings.Default.Save();
         }
 
         public static void ParseBoard(string board)
@@ -55,7 +62,7 @@ namespace FourChins
                 foreach (Thread thread in threads)
                 {
                     //Check if the last modified time is greater than the last run of the bot
-                    UInt64 LastModified = UInt64.Parse(thread.LastModified);
+                    ulong LastModified = ulong.Parse(thread.LastModified);
                     if (LastModified > lastRun)
                     {
                         //get the full details about the thread
@@ -72,64 +79,13 @@ namespace FourChins
                                 WriteToLog("Found wallet - " + walletAddress);
 
                                 //if the user has their address, check to see if they got a get
-                                switch (GetTheGet(post.PostNumber))
-                                {
-                                    case 1:
-                                        WriteToLog("singles - " + walletAddress);
-                                        break;
-                                    case 2:
-                                        WriteToLog("Dubs - " + walletAddress);
-                                        break;
-                                    case 3:
-                                        WriteToLog("Trips - " + walletAddress);
-                                        break;
-                                    case 4:
-                                        WriteToLog("Quads - " + walletAddress);
-                                        break;
-                                    case 5:
-                                        WriteToLog("quintuple - " + walletAddress);
-                                        break;
-                                    case 6:
-                                        WriteToLog("sextuple - " + walletAddress);
-                                        break;
-                                    case 7:
-                                        WriteToLog("septuple - " + walletAddress);
-                                        break;
-                                    case 8:
-                                        WriteToLog("octuple - " + walletAddress);
-                                        break;
-                                    case 9:
-                                        WriteToLog("nonuple - " + walletAddress);
-                                        break;
-                                    case 10:
-                                        WriteToLog("decuple - " + walletAddress);
-                                        break;
-                                    case 11:
-                                        WriteToLog("undecuple - " + walletAddress);
-                                        break;
-                                    case 12:
-                                        WriteToLog("duodecuple - " + walletAddress);
-                                        break;
-                                    case 13:
-                                        WriteToLog("tredecuple - " + walletAddress);
-                                        break;
-                                    case 14:
-                                        WriteToLog("quattuordecuple - " + walletAddress);
-                                        break;
-                                    case 15:
-                                        WriteToLog("quindecuple - " + walletAddress);
-                                        break;
-                                    default:
-                                        WriteToLog("Error");
-                                        break;
-
-                                }
+                                CheckAndHandleGet(post.PostNumber, walletAddress);
                             }
                         }
                     }
                     else
                     {
-                        WriteToLog("THREAD OLD!!!");
+                        WriteToLog("Thread has been parsed already");
                     }
                 }
             }
@@ -161,6 +117,61 @@ namespace FourChins
             } while (stillGoing);
 
             return iterations;
+        }
+
+        private static void CheckAndHandleGet(int postNumber, string walletAddress)
+        {
+            switch (GetTheGet(postNumber))
+            {
+                case 1:
+                    WriteToLog("singles - " + walletAddress);
+                    break;
+                case 2:
+                    WriteToLog("Dubs - " + walletAddress);
+                    break;
+                case 3:
+                    WriteToLog("Trips - " + walletAddress);
+                    break;
+                case 4:
+                    WriteToLog("Quads - " + walletAddress);
+                    break;
+                case 5:
+                    WriteToLog("quintuple - " + walletAddress);
+                    break;
+                case 6:
+                    WriteToLog("sextuple - " + walletAddress);
+                    break;
+                case 7:
+                    WriteToLog("septuple - " + walletAddress);
+                    break;
+                case 8:
+                    WriteToLog("octuple - " + walletAddress);
+                    break;
+                case 9:
+                    WriteToLog("nonuple - " + walletAddress);
+                    break;
+                case 10:
+                    WriteToLog("decuple - " + walletAddress);
+                    break;
+                case 11:
+                    WriteToLog("undecuple - " + walletAddress);
+                    break;
+                case 12:
+                    WriteToLog("duodecuple - " + walletAddress);
+                    break;
+                case 13:
+                    WriteToLog("tredecuple - " + walletAddress);
+                    break;
+                case 14:
+                    WriteToLog("quattuordecuple - " + walletAddress);
+                    break;
+                case 15:
+                    WriteToLog("quindecuple - " + walletAddress);
+                    break;
+                default:
+                    WriteToLog("Error");
+                    break;
+            }
         }
 
         private static void WriteToLog(string message)

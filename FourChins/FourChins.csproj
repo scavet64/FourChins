@@ -31,6 +31,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>FourChins.Program</StartupObject>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\FChan.Library.1.0.8\lib\portable-net45+wp80+win+MonoAndroid10+xamarinios10+MonoTouch10\Newtonsoft.Json.dll</HintPath>
@@ -49,6 +52,7 @@
     <Compile Include="Constants.cs" />
     <Compile Include="FourChins.cs" />
     <Compile Include="HTTPUtil.cs" />
+    <Compile Include="Model\AwardedPost.cs" />
     <Compile Include="Model\Board.cs" />
     <Compile Include="Model\BoardRootObject.cs" />
     <Compile Include="Model\Cooldowns.cs" />

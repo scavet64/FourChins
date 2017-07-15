@@ -46,5 +46,17 @@ namespace FourChins.Properties {
                 this["WaitTimeSpan"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public ulong LastRun {
+            get {
+                return ((ulong)(this["LastRun"]));
+            }
+            set {
+                this["LastRun"] = value;
+            }
+        }
     }
 }
