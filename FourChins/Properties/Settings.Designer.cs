@@ -106,5 +106,17 @@ namespace FourChins.Properties {
                 this["WalletServerPassword"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public double NumberOfCoinsAwarded {
+            get {
+                return ((double)(this["NumberOfCoinsAwarded"]));
+            }
+            set {
+                this["NumberOfCoinsAwarded"] = value;
+            }
+        }
     }
 }

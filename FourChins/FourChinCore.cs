@@ -161,30 +161,25 @@ namespace FChan.Library
             return returnThreadList;
         }
 
+        /// <summary>
+        /// Gets the list of pages for a board.
+        /// </summary>
+        /// <param name="board">Board to find pages for</param>
+        /// <returns>List of page objects that contain information about what threads are on each page</returns>
         public static List<Page> GetPagesFromBoard(string board)
         {
             return HTTPUtil.DownloadObject<List<Page>>(Constants.GetThreadsUrl(board));
         }
 
+        /// <summary>
+        /// Gets the list of pages for a board.
+        /// </summary>
+        /// <param name="board">Board to find pages for</param>
+        /// <returns>List of page objects that contain information about what threads are on each page</returns>
         public static Task<List<Page>> GetPagesFromBoardAsync(string board)
         {
             return HTTPUtil.DownloadObjectAsync<List<Page>>(Constants.GetThreadsUrl(board));
         }
 
-        /// <summary>
-        /// Gets the thread asynchronously.
-        /// </summary>
-        /// <returns>The thread.</returns>
-        /// <param name="board">Boad.</param>
-        /// <param name="threadNumber">Thread number.</param>
-        public static async Task<Thread> GetThreadsAsync(string board)
-        {
-            //Thread thread = await DownloadObjectAsync<Thread>(Constants.GetThreadsUrl(board));
-            //foreach (Post item in thread.Posts)
-            //    item.Board = board;
-
-            //return thread;
-            throw new NotImplementedException();
-        }
     }
 }

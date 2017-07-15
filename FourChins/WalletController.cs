@@ -10,6 +10,14 @@ namespace FourChins
     class WalletController
     {
 
+        /// <summary>
+        /// Send an award of coins to a wallet.
+        /// </summary>
+        /// <param name="walletAddress">Wallet to send coins to</param>
+        /// <param name="amount">amount of coins</param>
+        /// <param name="postNumber">post that is awarded</param>
+        /// <param name="url">URL of bot's hosted wallet</param>
+        /// <returns></returns>
         public static string SendAwardToWallet(string walletAddress, double amount, string postNumber, string url)
         {
             string jsonToSend = "{\"method\": \"sendtoaddress\", \"params\":[\"" + walletAddress + "\"," + amount.ToString() + ",\"A tip for post #" + postNumber + ".\"]}";

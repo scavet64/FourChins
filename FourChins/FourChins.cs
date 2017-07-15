@@ -12,11 +12,13 @@ namespace FourChins
     public class FourChins
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static Properties.Settings settings = Properties.Settings.Default;
 
-        private static ulong lastRun = 1500093062;
         private static HashSet<string> walletsFound;
         private static HashSet<Post> postsAwarded;
         private static int numberOfCoinsAwarded;
+
+        //unused as of now
         private static Dictionary<string, double> walletToEarnedCoinsMap;
         private static List<AwardedPost> awardedPostsList;
 
@@ -26,32 +28,34 @@ namespace FourChins
             postsAwarded = new HashSet<Post>();
             awardedPostsList = new List<AwardedPost>();
             numberOfCoinsAwarded = 0;
+        }
 
-            int waitTimeMS = Properties.Settings.Default.WaitTimeMS;
-            lastRun = Properties.Settings.Default.LastRun;
-
+        /// <summary>
+        /// Start running the bot.
+        /// </summary>
+        public void BotRunner()
+        {
             do
             {
-                StartRunningBot();
+                StartWork();
 
-                logger.Info("Sleeping for: " + waitTimeMS + "ms");
-                WriteToLog("Sleeping for: " + waitTimeMS + "ms");
-                System.Threading.Thread.Sleep(waitTimeMS);
+                logger.Info("Sleeping for: " + settings.WaitTimeMS + "ms");
+                System.Threading.Thread.Sleep(settings.WaitTimeMS);
             } while (true);
         }
 
         /// <summary>
         /// Gets all of the boards
         /// </summary>
-        public void StartRunningBot()
+        private void StartWork()
         {
+            WriteToLog("Starting work");
+
             ////////////////////////////////////////////
             //Test Code
             //AwardPost("CdEG5wxA93h7jj2BjBunLWgZy1pdfPoHAN", "22323232", 0.1);
             ////////////////////////////////////////////
 
-            WriteToLog("Starting up");
-            logger.Info("Starting up");
             BoardRootObject BoardsRootObject = FourChinCore.GetBoard();
 
             //for each board, parse it.
@@ -60,19 +64,19 @@ namespace FourChins
                 ParseBoard(board.BoardName);
             }
 
-            lastRun = (ulong)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
-            Properties.Settings.Default.LastRun = lastRun;
+            //set our last run to now and convert it to unix time. Unix time is very important as it is what the 4chan API uses.
+            settings.LastRun = (ulong)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
             Properties.Settings.Default.Save();
         }
 
         /// <summary>
-        /// Main method that will parse the board for any gets.
-        /// Starts by collecting all of the threads on the board at this time. For each thread, if
+        /// Method that will parse the board for any gets.
+        /// Starts by collecting all of the threads on the board. For each thread, if
         /// the last modified date is more recent than the previous run, request the posts for that thread.
         /// Iterate through the posts looking for posters that have the correct $4CHN: prefix. If they do,
         /// check for a get. Award the user if they got a get.
         /// </summary>
-        /// <param name="board"></param>
+        /// <param name="board">Board to parse</param>
         public static void ParseBoard(string board)
         {
             //get all the threads from the passed in board
@@ -83,7 +87,7 @@ namespace FourChins
                 {
                     //Check if the last modified time is greater than the last run of the bot
                     ulong LastModified = ulong.Parse(thread.LastModified);
-                    if (LastModified > lastRun)
+                    if (LastModified > settings.LastRun)
                     {
                         //get the full details about the thread
                         Thread fullThread = FourChinCore.GetThread(board, thread.ThreadNumber);
@@ -97,6 +101,7 @@ namespace FourChins
                             {
                                 string walletAddress = posterName.Replace("$4CHN:", "");
                                 WriteToLog("Found wallet - " + walletAddress);
+                                walletsFound.Add(walletAddress);
 
                                 //if the user has their address, check to see if they got a get
                                 CheckAndHandleGet(post.PostNumber, walletAddress);
@@ -204,7 +209,7 @@ namespace FourChins
                     WriteToLog("quindecuple - " + walletAddress);
                     break;
                 default:
-                    WriteToLog("Error");
+                    WriteToLog("Error in switch");
                     break;
             }
         }

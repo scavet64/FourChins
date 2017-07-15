@@ -23,5 +23,8 @@
     <Setting Name="WalletServerPassword" Type="System.String" Scope="User">
       <Value Profile="(Default)">password33</Value>
     </Setting>
+    <Setting Name="NumberOfCoinsAwarded" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
