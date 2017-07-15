@@ -10,7 +10,7 @@ namespace FourChins
 {
     public class FourChins
     {
-        private static Int32 lastRun = 0;
+        private static UInt64 lastRun = 0;
         private static ConcurrentBag<string> walletsFound;
         private static ConcurrentBag<Post> postsAwarded;
         private static int numberOfCoinsAwarded;
@@ -20,94 +20,119 @@ namespace FourChins
             walletsFound = new ConcurrentBag<string>();
             postsAwarded = new ConcurrentBag<Post>();
             numberOfCoinsAwarded = 0;
+
+            int waitTimeMS = Properties.Settings.Default.WaitTimeMS;
+
+            do
+            {
+                DoTheThing();
+
+                WriteToLog("Sleeping for: " + waitTimeMS + "ms");
+                System.Threading.Thread.Sleep(waitTimeMS);
+            } while (true);
         }
 
         public void DoTheThing()
         {
-            BoardRootObject test = FourChinCore.GetBoard();
-            String temp = test.Boards[0].BoardName;
-            temp = "biz";
-            List<Thread> threads = FourChinCore.GetAllThreadsFromBoard(temp);
-            foreach (Thread thread in threads)
+            WriteToLog("Starting up");
+            BoardRootObject BoardsRootObject = FourChinCore.GetBoard();
+
+            //for each board, parse it.
+            foreach (Board board in BoardsRootObject.Boards)
             {
-                Int32 LastModified = Int32.Parse(thread.LastModified);
-                if (LastModified > lastRun)
+                ParseBoard(board.BoardName);
+            }
+
+            lastRun = (UInt64)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+        }
+
+        public static void ParseBoard(string board)
+        {
+            //get all the threads from the passed in board
+            List<Thread> threads = FourChinCore.GetAllThreadsFromBoard(board);
+            if (threads != null)
+            {
+                foreach (Thread thread in threads)
                 {
-                    //Console.WriteLine("LastModified: " + thread.LastModified);
-                    //Console.WriteLine("ThreadNumber: " + thread.ThreadNumber);
-
-                    Thread fullThread = FourChinCore.GetThread(temp, thread.ThreadNumber);
-
-                    foreach (Post post in fullThread.Posts)
+                    //Check if the last modified time is greater than the last run of the bot
+                    UInt64 LastModified = UInt64.Parse(thread.LastModified);
+                    if (LastModified > lastRun)
                     {
-                        string posterName = post.Name;
-                        if (posterName != null && posterName.StartsWith("$4CHN:"))
+                        //get the full details about the thread
+                        Thread fullThread = FourChinCore.GetThread(board, thread.ThreadNumber);
+                        WriteToLog("Parsing Thread: " + thread.ThreadNumber);
+
+                        foreach (Post post in fullThread.Posts)
                         {
-                            string walletAddress = posterName.Replace("$4CHN:", "");
-                            Console.WriteLine("Found wallet - " + walletAddress);
-
-                            switch (GetTheGet(post.PostNumber))
+                            //for each post, check to see if the poster's name has their address
+                            string posterName = post.Name;
+                            if (posterName != null && posterName.StartsWith("$4CHN:"))
                             {
-                                case 1:
-                                    Console.WriteLine("singles - " + walletAddress);
-                                    break;
-                                case 2:
-                                    Console.WriteLine("Dubs - " + walletAddress);
-                                    break;
-                                case 3:
-                                    Console.WriteLine("Trips - " + walletAddress);
-                                    break;
-                                case 4:
-                                    Console.WriteLine("Quads - " + walletAddress);
-                                    break;
-                                case 5:
-                                    Console.WriteLine("quintuple - " + walletAddress);
-                                    break;
-                                case 6:
-                                    Console.WriteLine("sextuple - " + walletAddress);
-                                    break;
-                                case 7:
-                                    Console.WriteLine("septuple - " + walletAddress);
-                                    break;
-                                case 8:
-                                    Console.WriteLine("octuple - " + walletAddress);
-                                    break;
-                                case 9:
-                                    Console.WriteLine("nonuple - " + walletAddress);
-                                    break;
-                                case 10:
-                                    Console.WriteLine("decuple - " + walletAddress);
-                                    break;
-                                case 11:
-                                    Console.WriteLine("undecuple - " + walletAddress);
-                                    break;
-                                case 12:
-                                    Console.WriteLine("duodecuple - " + walletAddress);
-                                    break;
-                                case 13:
-                                    Console.WriteLine("tredecuple - " + walletAddress);
-                                    break;
-                                case 14:
-                                    Console.WriteLine("quattuordecuple - " + walletAddress);
-                                    break;
-                                case 15:
-                                    Console.WriteLine("quindecuple - " + walletAddress);
-                                    break;
-                                default:
-                                    Console.WriteLine("Error");
-                                    break;
+                                string walletAddress = posterName.Replace("$4CHN:", "");
+                                WriteToLog("Found wallet - " + walletAddress);
 
+                                //if the user has their address, check to see if they got a get
+                                switch (GetTheGet(post.PostNumber))
+                                {
+                                    case 1:
+                                        WriteToLog("singles - " + walletAddress);
+                                        break;
+                                    case 2:
+                                        WriteToLog("Dubs - " + walletAddress);
+                                        break;
+                                    case 3:
+                                        WriteToLog("Trips - " + walletAddress);
+                                        break;
+                                    case 4:
+                                        WriteToLog("Quads - " + walletAddress);
+                                        break;
+                                    case 5:
+                                        WriteToLog("quintuple - " + walletAddress);
+                                        break;
+                                    case 6:
+                                        WriteToLog("sextuple - " + walletAddress);
+                                        break;
+                                    case 7:
+                                        WriteToLog("septuple - " + walletAddress);
+                                        break;
+                                    case 8:
+                                        WriteToLog("octuple - " + walletAddress);
+                                        break;
+                                    case 9:
+                                        WriteToLog("nonuple - " + walletAddress);
+                                        break;
+                                    case 10:
+                                        WriteToLog("decuple - " + walletAddress);
+                                        break;
+                                    case 11:
+                                        WriteToLog("undecuple - " + walletAddress);
+                                        break;
+                                    case 12:
+                                        WriteToLog("duodecuple - " + walletAddress);
+                                        break;
+                                    case 13:
+                                        WriteToLog("tredecuple - " + walletAddress);
+                                        break;
+                                    case 14:
+                                        WriteToLog("quattuordecuple - " + walletAddress);
+                                        break;
+                                    case 15:
+                                        WriteToLog("quindecuple - " + walletAddress);
+                                        break;
+                                    default:
+                                        WriteToLog("Error");
+                                        break;
+
+                                }
                             }
                         }
                     }
-                }
-                else
-                {
-                    Console.WriteLine("THREAD OLD!!!");
+                    else
+                    {
+                        WriteToLog("THREAD OLD!!!");
+                    }
                 }
             }
-
-            lastRun = (Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
         }
 
         public static int GetTheGet(int postNumber)
@@ -136,6 +161,11 @@ namespace FourChins
             } while (stillGoing);
 
             return iterations;
+        }
+
+        private static void WriteToLog(string message)
+        {
+            Console.WriteLine(DateTime.UtcNow + ": " + message);
         }
     }
 }
