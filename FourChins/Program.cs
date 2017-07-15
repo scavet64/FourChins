@@ -1,4 +1,6 @@
-﻿namespace FourChins
+﻿[assembly: log4net.Config.XmlConfigurator(Watch = true)]
+
+namespace FourChins
 {
     class Program
     {

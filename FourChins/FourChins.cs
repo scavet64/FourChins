@@ -11,6 +11,8 @@ namespace FourChins
 {
     public class FourChins
     {
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         private static ulong lastRun = 1500093062;
         private static HashSet<string> walletsFound;
         private static HashSet<Post> postsAwarded;
@@ -32,6 +34,7 @@ namespace FourChins
             {
                 DoTheThing();
 
+                logger.Info("Sleeping for: " + waitTimeMS + "ms");
                 WriteToLog("Sleeping for: " + waitTimeMS + "ms");
                 System.Threading.Thread.Sleep(waitTimeMS);
             } while (true);
@@ -40,6 +43,7 @@ namespace FourChins
         public void DoTheThing()
         {
             WriteToLog("Starting up");
+            logger.Info("Starting up");
             BoardRootObject BoardsRootObject = FourChinCore.GetBoard();
 
             //for each board, parse it.

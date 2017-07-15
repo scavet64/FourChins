@@ -58,5 +58,53 @@ namespace FourChins.Properties {
                 this["LastRun"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("127.0.0.1")]
+        public string WalletServerAddress {
+            get {
+                return ((string)(this["WalletServerAddress"]));
+            }
+            set {
+                this["WalletServerAddress"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("43814")]
+        public string WalletServerPort {
+            get {
+                return ((string)(this["WalletServerPort"]));
+            }
+            set {
+                this["WalletServerPort"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("username")]
+        public string WallerServerUsername {
+            get {
+                return ((string)(this["WallerServerUsername"]));
+            }
+            set {
+                this["WallerServerUsername"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("password")]
+        public string WalletServerPassword {
+            get {
+                return ((string)(this["WalletServerPassword"]));
+            }
+            set {
+                this["WalletServerPassword"] = value;
+            }
+        }
     }
 }
