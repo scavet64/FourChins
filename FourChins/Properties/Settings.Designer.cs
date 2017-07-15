@@ -49,7 +49,7 @@ namespace FourChins.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("1500093800")]
         public ulong LastRun {
             get {
                 return ((ulong)(this["LastRun"]));

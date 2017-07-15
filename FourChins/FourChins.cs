@@ -11,7 +11,7 @@ namespace FourChins
 {
     public class FourChins
     {
-        private static ulong lastRun = 0;
+        private static ulong lastRun = 1500093062;
         private static HashSet<string> walletsFound;
         private static HashSet<Post> postsAwarded;
         private static int numberOfCoinsAwarded;
@@ -67,7 +67,7 @@ namespace FourChins
                     {
                         //get the full details about the thread
                         Thread fullThread = FourChinCore.GetThread(board, thread.ThreadNumber);
-                        WriteToLog("Parsing Thread: " + thread.ThreadNumber);
+                        WriteToLog("Parsing Thread: " + thread.ThreadNumber + " - Board: " + board);
 
                         foreach (Post post in fullThread.Posts)
                         {
