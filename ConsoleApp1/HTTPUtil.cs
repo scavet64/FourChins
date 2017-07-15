@@ -12,9 +12,9 @@ namespace FourChins
     public class HTTPUtil
     {
 
-        private static DateTime timeSinceLastAPICall;
+        private static DateTime timeSinceLastAPICall = DateTime.UtcNow;
 
-        private static TimeSpan waitInterval = new TimeSpan(0, 1, 0);
+        private static TimeSpan waitInterval = new TimeSpan(0, 0, 1);
 
         internal static T DownloadObject<T>(string url)
         {
@@ -39,11 +39,12 @@ namespace FourChins
 
         private static async Task<string> GetStringAsync(string url)
         {
-            TimeSpan tmp = timeSinceLastAPICall - DateTime.UtcNow;
-            if(tmp < waitInterval)
-            {
-                System.Threading.Thread.Sleep(waitInterval - tmp);
-            }
+                TimeSpan tmp = timeSinceLastAPICall - DateTime.UtcNow;
+                if (tmp < waitInterval)
+                {
+                    TimeSpan waitTime = waitInterval - tmp;
+                    System.Threading.Thread.Sleep(waitTime);
+                }
                 
             var request = WebRequest.CreateHttp(url);
             request.Method = "GET";
@@ -69,6 +70,7 @@ namespace FourChins
 
                 await stream.CopyToAsync(output);
                 var array = output.ToArray();
+                timeSinceLastAPICall = DateTime.UtcNow;
                 return Encoding.UTF8.GetString(array, 0, array.Length);
             }
         }
