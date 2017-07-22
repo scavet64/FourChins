@@ -49,7 +49,7 @@ namespace FourChins
         /// </summary>
         private void StartWork()
         {
-            WriteToLog("Starting work");
+            logger.Info("Starting work");
 
             ////////////////////////////////////////////
             //Test Code
@@ -102,7 +102,7 @@ namespace FourChins
             }
             else
             {
-                WriteToLog("Could not find AwardedPostXML file. Creating new list");
+                logger.Warn("Could not find AwardedPostXML file. Creating new list");
                 awardedPostsList = new List<AwardedPost>();
                 SaveAwardedPostXML();
             }
@@ -118,6 +118,8 @@ namespace FourChins
         /// <param name="board">Board to parse</param>
         public static void ParseBoard(string board)
         {
+            logger.Info("Parsing board: " + board);
+
             //get all the threads from the passed in board
             List<Thread> threads = FourChinCore.GetAllThreadsFromBoard(board);
             if (threads != null)
@@ -128,10 +130,26 @@ namespace FourChins
                     ulong LastModified = ulong.Parse(thread.LastModified);
                     if (LastModified > settings.LastRun)
                     {
-                        //get the full details about the thread
-                        Thread fullThread = FourChinCore.GetThread(board, thread.ThreadNumber);
-                        WriteToLog(string.Format("Parsing Thread: {0} - Board: {1}", thread.ThreadNumber, board));
+                        int attemptsLeft = settings.AttemptsGettingInformation;
+                        bool success = false;
+                        Thread fullThread;
+                        do
+                        {
+                            //get the full details about the thread
+                            fullThread = FourChinCore.GetThread(board, thread.ThreadNumber);
+                            if (fullThread != null && fullThread.Posts != null)
+                            {
+                                success = true;
+                            }
+                            else
+                            {
+                                logger.Warn(string.Format("Error getting fullthread information for #[{0}] - {1} attempts left", thread.ThreadNumber, attemptsLeft));
+                                attemptsLeft--;
+                            }
 
+                        } while (attemptsLeft > 0 || success);
+
+                        logger.Debug(string.Format("Parsing Thread: {0} - Board: {1}", thread.ThreadNumber, board));
                         foreach (Post post in fullThread.Posts)
                         {
                             //for each post, check to see if the poster's name has their address
@@ -139,7 +157,7 @@ namespace FourChins
                             if (posterName != null && posterName.StartsWith("$4CHN:"))
                             {
                                 string walletAddress = posterName.Replace("$4CHN:", "");
-                                WriteToLog("Found wallet - " + walletAddress);
+                                logger.Info("Found wallet - " + walletAddress);
 
                                 //if the user has their address, check to see if they got a get
                                 CheckAndHandleGet(post, walletAddress);
@@ -148,7 +166,7 @@ namespace FourChins
                     }
                     else
                     {
-                        WriteToLog(string.Format("Board [{0}] - Thread [{1}] has been parsed already", board, thread.ThreadNumber));
+                        logger.Debug(string.Format("Board [{0}] - Thread [{1}] has been parsed already", board, thread.ThreadNumber));
                     }
                 }
             }
@@ -204,59 +222,59 @@ namespace FourChins
             switch (GetTheGet(postNumber))
             {
                 case 1:
-                    WriteToLog("singles - " + walletAddress);
+                    logger.Info("singles - " + walletAddress);
                     break;
                 case 2:
-                    WriteToLog("Dubs - " + walletAddress);
+                    logger.Info("Dubs - " + walletAddress);
                     AwardPost(walletAddress, post, settings.DoubleAward);
                     break;
                 case 3:
-                    WriteToLog("Trips - " + walletAddress);
+                    logger.Info("Trips - " + walletAddress);
                     AwardPost(walletAddress, post, settings.TripsAward);
                     break;
                 case 4:
-                    WriteToLog("Quads - " + walletAddress);
+                    logger.Info("Quads - " + walletAddress);
                     AwardPost(walletAddress, post, settings.QuadsAward);
                     break;
                 case 5:
-                    WriteToLog("quintuple - " + walletAddress);
+                    logger.Info("quintuple - " + walletAddress);
                     AwardPost(walletAddress, post, settings.QuintsAward);
                     break;
                 case 6:
-                    WriteToLog("sextuple - " + walletAddress);
+                    logger.Info("sextuple - " + walletAddress);
                     AwardPost(walletAddress, post, settings.sextupleAward);
                     break;
                 case 7:
-                    WriteToLog("septuple - " + walletAddress);
+                    logger.Info("septuple - " + walletAddress);
                     AwardPost(walletAddress, post, settings.septupleAward);
                     break;
                 case 8:
-                    WriteToLog("octuple - " + walletAddress);
+                    logger.Info("octuple - " + walletAddress);
                     AwardPost(walletAddress, post, settings.octupleAward);
                     break;
                 case 9:
-                    WriteToLog("nonuple - " + walletAddress);
+                    logger.Info("nonuple - " + walletAddress);
                     break;
                 case 10:
-                    WriteToLog("decuple - " + walletAddress);
+                    logger.Info("decuple - " + walletAddress);
                     break;
                 case 11:
-                    WriteToLog("undecuple - " + walletAddress);
+                    logger.Info("undecuple - " + walletAddress);
                     break;
                 case 12:
-                    WriteToLog("duodecuple - " + walletAddress);
+                    logger.Info("duodecuple - " + walletAddress);
                     break;
                 case 13:
-                    WriteToLog("tredecuple - " + walletAddress);
+                    logger.Info("tredecuple - " + walletAddress);
                     break;
                 case 14:
-                    WriteToLog("quattuordecuple - " + walletAddress);
+                    logger.Info("quattuordecuple - " + walletAddress);
                     break;
                 case 15:
-                    WriteToLog("quindecuple - " + walletAddress);
+                    logger.Info("quindecuple - " + walletAddress);
                     break;
                 default:
-                    WriteToLog("Error in switch");
+                    logger.Error("Error in switch");
                     break;
             }
         }
@@ -276,12 +294,12 @@ namespace FourChins
                 settings.NumberOfCoinsAwarded += amount;
 
                 //log the event and send the coins
-                WriteToLog(string.Format("Awarding wallet: {0} - with {1} Chancoins for post: {2}", wallet, amount, post.PostNumber));
+                logger.Info(string.Format("Awarding wallet: {0} - with {1} Chancoins for post: {2}", wallet, amount, post.PostNumber));
                 WalletController.SendAwardToWallet(wallet, amount, post.PostNumber, BuildURL());
             }
             else
             {
-                WriteToLog("Skipping award for postnumber: " + post.PostNumber);
+                logger.Info("Skipping award for postnumber: " + post.PostNumber);
             }
             
         }
@@ -295,16 +313,6 @@ namespace FourChins
             var properties = Properties.Settings.Default;
             string url = string.Format("http://{0}:{1}", properties.WalletServerAddress, properties.WalletServerPort);
             return url;
-        }
-
-        /// <summary>
-        /// This currently writes to the console and a txt file where the exe is located.
-        /// </summary>
-        /// <param name="message">Message to log</param>
-        private static void WriteToLog(string message)
-        {
-            logger.Info(message);
-            Console.WriteLine(DateTime.UtcNow + ": " + message);
         }
     }
 }

@@ -226,5 +226,17 @@ namespace FourChins.Properties {
                 this["ParseOlderThreads"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("5")]
+        public int AttemptsGettingInformation {
+            get {
+                return ((int)(this["AttemptsGettingInformation"]));
+            }
+            set {
+                this["AttemptsGettingInformation"] = value;
+            }
+        }
     }
 }
