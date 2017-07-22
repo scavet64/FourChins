@@ -49,18 +49,6 @@ namespace FourChins.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1500093800")]
-        public ulong LastRun {
-            get {
-                return ((ulong)(this["LastRun"]));
-            }
-            set {
-                this["LastRun"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("127.0.0.1")]
         public string WalletServerAddress {
             get {

@@ -46,7 +46,7 @@ namespace FourChins
         private static async Task<string> GetStringAsync(string url)
         {
             TimeSpan tmp = DateTime.UtcNow - timeSinceLastAPICall;
-            logger.Debug("difference: "+tmp.TotalSeconds);
+            logger.Debug("difference: " + tmp.TotalSeconds);
             if (tmp < waitInterval)
             {
                 TimeSpan waitTime = waitInterval - tmp;

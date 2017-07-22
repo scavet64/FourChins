@@ -8,9 +8,6 @@
     <Setting Name="WaitTimeSpan" Type="System.TimeSpan" Scope="User">
       <Value Profile="(Default)">00:05:00</Value>
     </Setting>
-    <Setting Name="LastRun" Type="System.UInt64" Scope="User">
-      <Value Profile="(Default)">1500093800</Value>
-    </Setting>
     <Setting Name="WalletServerAddress" Type="System.String" Scope="User">
       <Value Profile="(Default)">127.0.0.1</Value>
     </Setting>

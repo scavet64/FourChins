@@ -13,15 +13,20 @@ namespace FourChins
 {
     public class FourChins
     {
-        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-        private static Properties.Settings settings = Properties.Settings.Default;
-        private static XmlSerializer serializer = new XmlSerializer(typeof(List<AwardedPost>));
-        private static readonly string AwardedPostXMLFileName = "AwardedPostList.XML";
-        private static List<AwardedPost> awardedPostsList;
+        private readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private Properties.Settings settings = Properties.Settings.Default;
+        private XmlSerializer serializer = new XmlSerializer(typeof(List<AwardedPost>));
+        private XmlSerializer LastCrawledserializer = new XmlSerializer(typeof(LastCrawledTracker));
+        private readonly string LastCrawledTrackerXMLFileName = "LastCrawledTracker.XML";
+        private readonly string AwardedPostXMLFileName = "AwardedPostList.XML";
+        private List<AwardedPost> awardedPostsList;
+        private LastCrawledTracker lastCrawledTracker;
+        private bool firstrun = true;
 
         public FourChins()
         {
             LoadAwardedPostXML();
+            LoadLastCrawledTracker();
         }
 
         /// <summary>
@@ -29,15 +34,10 @@ namespace FourChins
         /// </summary>
         public void BotRunner()
         {
-
-            if (!settings.ParseOlderThreads)
-            {
-                SetLastRunTime();
-            }
-
             do
             {
                 StartWork();
+                firstrun = false;
 
                 logger.Info("Sleeping for: " + settings.WaitTimeMS + "ms");
                 System.Threading.Thread.Sleep(settings.WaitTimeMS);
@@ -55,10 +55,15 @@ namespace FourChins
             //for each board, parse it.
             foreach (Board board in BoardsRootObject.Boards)
             {
+                //are we parsing threads older than the start of this bot?
+                //if not set the time we last ran to now. threads updated passed this point will be considered.
+                if (!settings.ParseOlderThreads && firstrun)
+                {
+                    SetLastRunTimeForBoard(board.BoardName);
+                }
+
                 ParseBoard(board.BoardName);
             }
-
-            SetLastRunTime();
         }
 
         /// <summary>
@@ -69,19 +74,24 @@ namespace FourChins
         /// check for a get. Award the user if they got a get.
         /// </summary>
         /// <param name="board">Board to parse</param>
-        public static void ParseBoard(string board)
+        public void ParseBoard(string board)
         {
             logger.Info("Parsing board: " + board);
+            ulong lastCrawled = lastCrawledTracker.GetLastCrawledTimeFromBoard(board);
 
             //get all the threads from the passed in board
             List<Thread> threads = FourChinCore.GetAllThreadsFromBoard(board);
+
+            //set the time we last gathered information from this board
+            SetLastRunTimeForBoard(board);
+
             if (threads != null)
             {
                 foreach (Thread thread in threads)
                 {
                     //Check if the last modified time is greater than the last run of the bot
                     ulong LastModified = ulong.Parse(thread.LastModified);
-                    if (LastModified > settings.LastRun)
+                    if (LastModified > lastCrawled)
                     {
                         int attemptsLeft = settings.AttemptsGettingInformation;
                         bool success = false;
@@ -137,7 +147,7 @@ namespace FourChins
         /// </summary>
         /// <param name="postNumber">Post number to check</param>
         /// <returns>returns the number of consecutive final digits</returns>
-        public static int GetTheGet(int postNumber)
+        public int GetTheGet(int postNumber)
         {
             return GetTheGet(postNumber.ToString());
         }
@@ -147,7 +157,7 @@ namespace FourChins
         /// </summary>
         /// <param name="postNumber">Post number to check</param>
         /// <returns>returns the number of consecutive final digits</returns>
-        public static int GetTheGet(string postNumber)
+        public int GetTheGet(string postNumber)
         {
             int iterations = 0;
             char lastDigit = postNumber[postNumber.Length - 1];
@@ -175,7 +185,7 @@ namespace FourChins
         /// </summary>
         /// <param name="postNumber">Post number to check</param>
         /// <param name="walletAddress">Address to send the coins to if successful</param>
-        private static void CheckAndHandleGet(Post post, string walletAddress)
+        private void CheckAndHandleGet(Post post, string walletAddress)
         {
             int postNumber = post.PostNumber;
 
@@ -245,7 +255,7 @@ namespace FourChins
         /// <param name="wallet">Wallet we are sending the coins to</param>
         /// <param name="postnumber">The post number that is getting the award</param>
         /// <param name="amount">the amount of coins we are sending</param>
-        private static void AwardPost(string wallet, Post post, double amount)
+        private void AwardPost(string wallet, Post post, double amount)
         {
             if (settings.Awarding)
             {
@@ -276,7 +286,7 @@ namespace FourChins
         /// Builds the URL using the settings file
         /// </summary>
         /// <returns>String URL</returns>
-        private static string BuildURL()
+        private string BuildURL()
         {
             var properties = Properties.Settings.Default;
             string url = string.Format("http://{0}:{1}", properties.WalletServerAddress, properties.WalletServerPort);
@@ -288,10 +298,11 @@ namespace FourChins
         /// <summary>
         /// set our last run to now and convert it to unix time. Unix time is very important as it is what the 4chan API uses.
         /// </summary>
-        private void SetLastRunTime()
+        private void SetLastRunTimeForBoard(string board)
         {
-            settings.LastRun = (ulong)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
-            Properties.Settings.Default.Save();
+            ulong lastRun = (ulong)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+            lastCrawledTracker.UpdateCrawledBoardTime(board);
+            SaveLastCrawledTracker();
         }
 
         /// <summary>
@@ -314,7 +325,7 @@ namespace FourChins
             {
                 using (FileStream stream = File.OpenRead(AwardedPostXMLFileName))
                 {
-                    List<AwardedPost> dezerializedList = (List<AwardedPost>)serializer.Deserialize(stream);
+                    awardedPostsList = (List<AwardedPost>)serializer.Deserialize(stream);
                 }
             }
             else
@@ -322,6 +333,31 @@ namespace FourChins
                 logger.Warn("Could not find AwardedPostXML file. Creating new list");
                 awardedPostsList = new List<AwardedPost>();
                 SaveAwardedPostXML();
+            }
+        }
+
+        private void SaveLastCrawledTracker()
+        {
+            using (FileStream stream = File.OpenWrite(LastCrawledTrackerXMLFileName))
+            {
+                LastCrawledserializer.Serialize(stream, lastCrawledTracker);
+            }
+        }
+
+        private void LoadLastCrawledTracker()
+        {
+            if (File.Exists(LastCrawledTrackerXMLFileName))
+            {
+                using (FileStream stream = File.OpenRead(LastCrawledTrackerXMLFileName))
+                {
+                    lastCrawledTracker = (LastCrawledTracker)LastCrawledserializer.Deserialize(stream);
+                }
+            }
+            else
+            {
+                logger.Warn("Could not find LastCrawledTracker file. Creating new object");
+                lastCrawledTracker = new LastCrawledTracker();
+                SaveLastCrawledTracker();
             }
         }
         #endregion
