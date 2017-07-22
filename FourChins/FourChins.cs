@@ -17,16 +17,20 @@ namespace FourChins
         private Properties.Settings settings = Properties.Settings.Default;
         private XmlSerializer serializer = new XmlSerializer(typeof(List<AwardedPost>));
         private XmlSerializer LastCrawledserializer = new XmlSerializer(typeof(LastCrawledTracker));
+        private XmlSerializer foundWalletSerializer = new XmlSerializer(typeof(HashSet<string>));
         private readonly string LastCrawledTrackerXMLFileName = "LastCrawledTracker.XML";
         private readonly string AwardedPostXMLFileName = "AwardedPostList.XML";
+        private readonly string FoundWalletSetXMLFileName = "FoundWalletSet.XML";
         private List<AwardedPost> awardedPostsList;
         private LastCrawledTracker lastCrawledTracker;
+        private HashSet<string> foundWalletSet;
         private bool firstrun = true;
 
         public FourChins()
         {
             LoadAwardedPostXML();
             LoadLastCrawledTracker();
+            LoadFoundWalletSet();
         }
 
         /// <summary>
@@ -109,7 +113,6 @@ namespace FourChins
                                 logger.Warn(string.Format("Error getting fullthread information for #[{0}] - {1} attempts left", thread.ThreadNumber, attemptsLeft));
                                 attemptsLeft--;
                             }
-
                         } while (attemptsLeft > 0 && !success);
 
                         //check to see if we are still null after the 5 attempts. If so, skip this iteration of the loop
@@ -127,6 +130,8 @@ namespace FourChins
                             if (posterName != null && posterName.StartsWith("$4CHN:"))
                             {
                                 string walletAddress = posterName.Replace("$4CHN:", "");
+                                foundWalletSet.Add(walletAddress);
+                                SaveFoundWalletSet();
                                 logger.Info("Found wallet - " + walletAddress);
 
                                 //if the user has their address, check to see if they got a get
@@ -358,6 +363,31 @@ namespace FourChins
                 logger.Warn("Could not find LastCrawledTracker file. Creating new object");
                 lastCrawledTracker = new LastCrawledTracker();
                 SaveLastCrawledTracker();
+            }
+        }
+
+        private void SaveFoundWalletSet()
+        {
+            using (FileStream stream = File.OpenWrite(FoundWalletSetXMLFileName))
+            {
+                foundWalletSerializer.Serialize(stream, foundWalletSet);
+            }
+        }
+
+        private void LoadFoundWalletSet()
+        {
+            if (File.Exists(FoundWalletSetXMLFileName))
+            {
+                using (FileStream stream = File.OpenRead(FoundWalletSetXMLFileName))
+                {
+                    foundWalletSet = (HashSet<string>)foundWalletSerializer.Deserialize(stream);
+                }
+            }
+            else
+            {
+                logger.Warn("Could not find FoundWalletSet file. Creating new object");
+                foundWalletSet = new HashSet<string>();
+                SaveFoundWalletSet();
             }
         }
         #endregion
