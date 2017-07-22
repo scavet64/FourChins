@@ -69,46 +69,6 @@ namespace FourChins
         }
 
         /// <summary>
-        /// set our last run to now and convert it to unix time. Unix time is very important as it is what the 4chan API uses.
-        /// </summary>
-        private void SetLastRunTime()
-        {
-            settings.LastRun = (ulong)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
-            Properties.Settings.Default.Save();
-        }
-
-        /// <summary>
-        /// save the awarded post list to the xml file
-        /// </summary>
-        private void SaveAwardedPostXML()
-        {
-            using (FileStream stream = File.OpenWrite(AwardedPostXMLFileName))
-            {
-                serializer.Serialize(stream, awardedPostsList);
-            }
-        }
-        
-        /// <summary>
-        /// Load the awarded post list from the xml file
-        /// </summary>
-        private void LoadAwardedPostXML()
-        {
-            if (File.Exists(AwardedPostXMLFileName))
-            {
-                using (FileStream stream = File.OpenRead(AwardedPostXMLFileName))
-                {
-                    List<AwardedPost> dezerializedList = (List<AwardedPost>)serializer.Deserialize(stream);
-                }
-            }
-            else
-            {
-                logger.Warn("Could not find AwardedPostXML file. Creating new list");
-                awardedPostsList = new List<AwardedPost>();
-                SaveAwardedPostXML();
-            }
-        }
-
-        /// <summary>
         /// Method that will parse the board for any gets.
         /// Starts by collecting all of the threads on the board. For each thread, if
         /// the last modified date is more recent than the previous run, request the posts for that thread.
@@ -321,5 +281,48 @@ namespace FourChins
             string url = string.Format("http://{0}:{1}", properties.WalletServerAddress, properties.WalletServerPort);
             return url;
         }
+
+        #region saving and loading information
+
+        /// <summary>
+        /// set our last run to now and convert it to unix time. Unix time is very important as it is what the 4chan API uses.
+        /// </summary>
+        private void SetLastRunTime()
+        {
+            settings.LastRun = (ulong)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+            Properties.Settings.Default.Save();
+        }
+
+        /// <summary>
+        /// save the awarded post list to the xml file
+        /// </summary>
+        private void SaveAwardedPostXML()
+        {
+            using (FileStream stream = File.OpenWrite(AwardedPostXMLFileName))
+            {
+                serializer.Serialize(stream, awardedPostsList);
+            }
+        }
+
+        /// <summary>
+        /// Load the awarded post list from the xml file
+        /// </summary>
+        private void LoadAwardedPostXML()
+        {
+            if (File.Exists(AwardedPostXMLFileName))
+            {
+                using (FileStream stream = File.OpenRead(AwardedPostXMLFileName))
+                {
+                    List<AwardedPost> dezerializedList = (List<AwardedPost>)serializer.Deserialize(stream);
+                }
+            }
+            else
+            {
+                logger.Warn("Could not find AwardedPostXML file. Creating new list");
+                awardedPostsList = new List<AwardedPost>();
+                SaveAwardedPostXML();
+            }
+        }
+        #endregion
     }
 }
