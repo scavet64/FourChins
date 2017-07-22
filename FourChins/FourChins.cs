@@ -249,13 +249,21 @@ namespace FourChins
         {
             if (settings.Awarding)
             {
-                //add to the list and total number of coins awarded
-                awardedPostsList.Add(new AwardedPost(post, wallet, amount));
-                settings.NumberOfCoinsAwarded += amount;
+                AwardedPost potentialAwardedPost = new AwardedPost(post, wallet, amount);
+                if (!awardedPostsList.Contains(potentialAwardedPost))
+                {
+                    //add to the list and total number of coins awarded
+                    awardedPostsList.Add(new AwardedPost(post, wallet, amount));
+                    settings.NumberOfCoinsAwarded += amount;
 
-                //log the event and send the coins
-                logger.Info(string.Format("Awarding wallet: {0} - with {1} Chancoins for post: {2}", wallet, amount, post.PostNumber));
-                WalletController.SendAwardToWallet(wallet, amount, post.PostNumber, BuildURL());
+                    //log the event and send the coins
+                    logger.Info(string.Format("Awarding wallet: {0} - with {1} Chancoins for post: {2}", wallet, amount, post.PostNumber));
+                    WalletController.SendAwardToWallet(wallet, amount, post.PostNumber, BuildURL());
+                }
+                else
+                {
+                    logger.Warn(string.Format("PostNumber[{0}] was detected to be a duplicate. No awards were given.", post.PostNumber));
+                }
             }
             else
             {
