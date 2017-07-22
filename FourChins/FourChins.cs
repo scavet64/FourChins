@@ -50,12 +50,6 @@ namespace FourChins
         private void StartWork()
         {
             logger.Info("Starting work");
-
-            ////////////////////////////////////////////
-            //Test Code
-            //AwardPost("CdEG5wxA93h7jj2BjBunLWgZy1pdfPoHAN", "22323232", 0.1);
-            ////////////////////////////////////////////
-
             BoardRootObject BoardsRootObject = FourChinCore.GetBoard();
 
             //for each board, parse it.
@@ -65,7 +59,6 @@ namespace FourChins
             }
 
             SetLastRunTime();
-
         }
 
         /// <summary>
