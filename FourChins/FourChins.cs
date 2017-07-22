@@ -148,7 +148,7 @@ namespace FourChins
                     }
                     else
                     {
-                        WriteToLog(string.Format("Thread [{0}] - Board: {1} has been parsed already", thread.ThreadNumber, board));
+                        WriteToLog(string.Format("Board [{0}] - Thread [{1}] has been parsed already", board, thread.ThreadNumber));
                     }
                 }
             }
