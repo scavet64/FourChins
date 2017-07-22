@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -9,6 +10,7 @@ namespace FourChins
 {
     class WalletController
     {
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         /// <summary>
         /// Send an award of coins to a wallet.
@@ -21,7 +23,17 @@ namespace FourChins
         public static string SendAwardToWallet(string walletAddress, double amount, int postNumber, string url)
         {
             string jsonToSend = "{\"method\": \"sendtoaddress\", \"params\":[\"" + walletAddress + "\"," + amount.ToString() + ",\"A tip for post #" + postNumber.ToString() + ".\"]}";
-            return HTTPUtil.PostJsonString(Properties.Settings.Default.WalletServerUsername, Properties.Settings.Default.WalletServerPassword, url, jsonToSend);
+            string response = null;
+
+            try
+            {
+                response = HTTPUtil.PostJsonString(Properties.Settings.Default.WalletServerUsername, Properties.Settings.Default.WalletServerPassword, url, jsonToSend);
+            }
+            catch (WebException ex)
+            {
+                logger.Fatal(string.Format("Error sending award[{3}] to wallet[{0}] for post[{1}]: {2}", walletAddress, postNumber, ex.Message, amount), ex);
+            }
+            return response;
         }
     }
 }
