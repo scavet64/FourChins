@@ -214,5 +214,17 @@ namespace FourChins.Properties {
                 this["Awarding"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ParseOlderThreads {
+            get {
+                return ((bool)(this["ParseOlderThreads"]));
+            }
+            set {
+                this["ParseOlderThreads"] = value;
+            }
+        }
     }
 }

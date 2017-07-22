@@ -10,6 +10,21 @@ namespace FourChins.Model
 {
     public class AwardedPost
     {
+        /// <summary>
+        /// default empty constructor
+        /// </summary>
+        public AwardedPost()
+        {
+
+        }
+
+        public AwardedPost(Post post, string walletAddress, double numberOfCoins)
+        {
+            this.Post = post;
+            this.WalletAddress = walletAddress;
+            this.NumberOfCoins = numberOfCoins;
+        }
+
         [XmlElement("post")]
         public Post Post { get; set; }
 
@@ -17,6 +32,6 @@ namespace FourChins.Model
         public string WalletAddress { get; set; }
 
         [XmlElement("NumberOfCoins")]
-        public int NumberOfCoins { get; set; }
+        public double NumberOfCoins { get; set; }
     }
 }

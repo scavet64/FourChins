@@ -3,9 +3,11 @@ using FourChins.Model;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 namespace FourChins
 {
@@ -13,19 +15,13 @@ namespace FourChins
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private static Properties.Settings settings = Properties.Settings.Default;
-
-        private static HashSet<string> walletsFound;
-        private static HashSet<Post> postsAwarded;
-        private static int numberOfCoinsAwarded;
-        private static Dictionary<string, double> walletToEarnedCoinsMap;
+        private static XmlSerializer serializer = new XmlSerializer(typeof(List<AwardedPost>));
+        private static readonly string AwardedPostXMLFileName = "AwardedPostList.XML";
         private static List<AwardedPost> awardedPostsList;
 
         public FourChins()
         {
-            walletsFound = new HashSet<string>();
-            postsAwarded = new HashSet<Post>();
-            awardedPostsList = new List<AwardedPost>();
-            numberOfCoinsAwarded = 0;
+            LoadAwardedPostXML();
         }
 
         /// <summary>
@@ -33,6 +29,12 @@ namespace FourChins
         /// </summary>
         public void BotRunner()
         {
+
+            if (!settings.ParseOlderThreads)
+            {
+                SetLastRunTime();
+            }
+
             do
             {
                 StartWork();
@@ -62,9 +64,48 @@ namespace FourChins
                 ParseBoard(board.BoardName);
             }
 
-            //set our last run to now and convert it to unix time. Unix time is very important as it is what the 4chan API uses.
+            SetLastRunTime();
+
+        }
+
+        /// <summary>
+        /// set our last run to now and convert it to unix time. Unix time is very important as it is what the 4chan API uses.
+        /// </summary>
+        private void SetLastRunTime()
+        {
             settings.LastRun = (ulong)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
             Properties.Settings.Default.Save();
+        }
+
+        /// <summary>
+        /// save the awarded post list to the xml file
+        /// </summary>
+        private void SaveAwardedPostXML()
+        {
+            using (FileStream stream = File.OpenWrite(AwardedPostXMLFileName))
+            {
+                serializer.Serialize(stream, awardedPostsList);
+            }
+        }
+        
+        /// <summary>
+        /// Load the awarded post list from the xml file
+        /// </summary>
+        private void LoadAwardedPostXML()
+        {
+            if (File.Exists(AwardedPostXMLFileName))
+            {
+                using (FileStream stream = File.OpenRead(AwardedPostXMLFileName))
+                {
+                    List<AwardedPost> dezerializedList = (List<AwardedPost>)serializer.Deserialize(stream);
+                }
+            }
+            else
+            {
+                WriteToLog("Could not find AwardedPostXML file. Creating new list");
+                awardedPostsList = new List<AwardedPost>();
+                SaveAwardedPostXML();
+            }
         }
 
         /// <summary>
@@ -99,16 +140,15 @@ namespace FourChins
                             {
                                 string walletAddress = posterName.Replace("$4CHN:", "");
                                 WriteToLog("Found wallet - " + walletAddress);
-                                walletsFound.Add(walletAddress);
 
                                 //if the user has their address, check to see if they got a get
-                                CheckAndHandleGet(post.PostNumber, walletAddress);
+                                CheckAndHandleGet(post, walletAddress);
                             }
                         }
                     }
                     else
                     {
-                        WriteToLog(string.Format("Thread [{0}] has been parsed already", thread.ThreadNumber));
+                        WriteToLog(string.Format("Thread [{0}] - Board: {1} has been parsed already", thread.ThreadNumber, board));
                     }
                 }
             }
@@ -157,8 +197,10 @@ namespace FourChins
         /// </summary>
         /// <param name="postNumber">Post number to check</param>
         /// <param name="walletAddress">Address to send the coins to if successful</param>
-        private static void CheckAndHandleGet(int postNumber, string walletAddress)
+        private static void CheckAndHandleGet(Post post, string walletAddress)
         {
+            int postNumber = post.PostNumber;
+
             switch (GetTheGet(postNumber))
             {
                 case 1:
@@ -166,31 +208,31 @@ namespace FourChins
                     break;
                 case 2:
                     WriteToLog("Dubs - " + walletAddress);
-                    AwardPost(walletAddress, postNumber, settings.DoubleAward);
+                    AwardPost(walletAddress, post, settings.DoubleAward);
                     break;
                 case 3:
                     WriteToLog("Trips - " + walletAddress);
-                    AwardPost(walletAddress, postNumber, settings.TripsAward);
+                    AwardPost(walletAddress, post, settings.TripsAward);
                     break;
                 case 4:
                     WriteToLog("Quads - " + walletAddress);
-                    AwardPost(walletAddress, postNumber, settings.QuadsAward);
+                    AwardPost(walletAddress, post, settings.QuadsAward);
                     break;
                 case 5:
                     WriteToLog("quintuple - " + walletAddress);
-                    AwardPost(walletAddress, postNumber, settings.QuintsAward);
+                    AwardPost(walletAddress, post, settings.QuintsAward);
                     break;
                 case 6:
                     WriteToLog("sextuple - " + walletAddress);
-                    AwardPost(walletAddress, postNumber, settings.sextupleAward);
+                    AwardPost(walletAddress, post, settings.sextupleAward);
                     break;
                 case 7:
                     WriteToLog("septuple - " + walletAddress);
-                    AwardPost(walletAddress, postNumber, settings.septupleAward);
+                    AwardPost(walletAddress, post, settings.septupleAward);
                     break;
                 case 8:
                     WriteToLog("octuple - " + walletAddress);
-                    AwardPost(walletAddress, postNumber, settings.octupleAward);
+                    AwardPost(walletAddress, post, settings.octupleAward);
                     break;
                 case 9:
                     WriteToLog("nonuple - " + walletAddress);
@@ -225,19 +267,21 @@ namespace FourChins
         /// <param name="wallet">Wallet we are sending the coins to</param>
         /// <param name="postnumber">The post number that is getting the award</param>
         /// <param name="amount">the amount of coins we are sending</param>
-        private static void AwardPost(string wallet, int postnumber, double amount)
+        private static void AwardPost(string wallet, Post post, double amount)
         {
-            walletToEarnedCoinsMap.Add(wallet, amount);
-            settings.NumberOfCoinsAwarded += amount;
-
             if (settings.Awarding)
             {
-                logger.Info(string.Format("Awarding wallet: {0} - with {1} Chancoins for post: {2}", wallet, amount, postnumber));
-                WalletController.SendAwardToWallet(wallet, amount, postnumber, BuildURL());
+                //add to the list and total number of coins awarded
+                awardedPostsList.Add(new AwardedPost(post, wallet, amount));
+                settings.NumberOfCoinsAwarded += amount;
+
+                //log the event and send the coins
+                WriteToLog(string.Format("Awarding wallet: {0} - with {1} Chancoins for post: {2}", wallet, amount, post.PostNumber));
+                WalletController.SendAwardToWallet(wallet, amount, post.PostNumber, BuildURL());
             }
             else
             {
-                logger.Info("Skipping award");
+                WriteToLog("Skipping award for postnumber: " + post.PostNumber);
             }
             
         }
