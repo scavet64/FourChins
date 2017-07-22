@@ -20,6 +20,7 @@ namespace FourChins
         /// </summary>
         private static DateTime timeSinceLastAPICall = DateTime.UtcNow;
         private static TimeSpan waitInterval = new TimeSpan(0, 0, 1);
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         internal static T DownloadObject<T>(string url)
         {
@@ -44,12 +45,15 @@ namespace FourChins
 
         private static async Task<string> GetStringAsync(string url)
         {
-                TimeSpan tmp = timeSinceLastAPICall - DateTime.UtcNow;
-                if (tmp < waitInterval)
-                {
-                    TimeSpan waitTime = waitInterval - tmp;
-                    System.Threading.Thread.Sleep(waitTime);
-                }
+            TimeSpan tmp = DateTime.UtcNow - timeSinceLastAPICall;
+            logger.Debug("difference: "+tmp.TotalSeconds);
+            if (tmp < waitInterval)
+            {
+                TimeSpan waitTime = waitInterval - tmp;
+                logger.Debug("waitTime: " + waitTime.TotalSeconds);
+
+                System.Threading.Thread.Sleep(waitTime);
+            }
                 
             var request = WebRequest.CreateHttp(url);
             request.Method = "GET";
