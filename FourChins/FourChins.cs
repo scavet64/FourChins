@@ -147,7 +147,7 @@ namespace FourChins
                                 attemptsLeft--;
                             }
 
-                        } while (attemptsLeft > 0 || success);
+                        } while (attemptsLeft > 0 && !success);
 
                         logger.Debug(string.Format("Parsing Thread: {0} - Board: {1}", thread.ThreadNumber, board));
                         foreach (Post post in fullThread.Posts)
