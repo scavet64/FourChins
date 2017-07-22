@@ -149,6 +149,13 @@ namespace FourChins
 
                         } while (attemptsLeft > 0 && !success);
 
+                        //check to see if we are still null after the 5 attempts. If so, skip this iteration of the loop
+                        if (fullThread == null || fullThread.Posts == null)
+                        {
+                            logger.Error("Could not get the posts for thread[{0}] - Thread might have been deleted or died");
+                            continue;
+                        }
+
                         logger.Debug(string.Format("Parsing Thread: {0} - Board: {1}", thread.ThreadNumber, board));
                         foreach (Post post in fullThread.Posts)
                         {
