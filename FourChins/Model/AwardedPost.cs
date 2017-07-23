@@ -41,7 +41,7 @@ namespace FourChins.Model
         public double NumberOfCoins { get; set; }
 
         /// <summary>
-        /// override of Equals. Only takes into consideration the post object and wallet address.
+        /// override of Equals. Only takes into consideration the post number and wallet address.
         /// We do not want to send more coins to the same address for the same post. Regardless of coin amount
         /// </summary>
         /// <param name="obj">obj to compare to</param>

@@ -269,6 +269,7 @@ namespace FourChins
                 {
                     //add to the list and total number of coins awarded
                     awardedPostsList.Add(new AwardedPost(post, wallet, amount));
+                    SaveAwardedPostXML();
                     settings.NumberOfCoinsAwarded += amount;
 
                     //log the event and send the coins

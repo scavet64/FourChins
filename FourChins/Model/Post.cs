@@ -501,5 +501,35 @@ namespace FChan.Library
         {
             return JsonConvert.DeserializeObject<Post>(json);
         }
+
+        /// <summary>
+        /// override of Equals. Only takes into consideration the number, name, and date.
+        /// Posts that are matchin in this information are considered to be equals
+        /// </summary>
+        /// <param name="obj">obj to compare to</param>
+        /// <returns>true if equal</returns>
+        public override bool Equals(object obj)
+        {
+            bool equal = false;
+            if(obj is Post)
+            {
+                Post post = (Post)obj;
+                equal = (this.PostNumber == post.PostNumber && this.Name.Equals(post.Name) && this.Date.Equals(post.Date));
+            }
+            return equal;
+        }
+
+        /// <summary>
+        /// override of GetHashCode. Only takes into consideration the number, name, and date.
+        /// </summary>
+        /// <returns>HashCode integer</returns>
+        public override int GetHashCode()
+        {
+            int hash = 13;
+            hash = (hash * 7) + PostNumber.GetHashCode();
+            hash = (hash * 7) + Name.GetHashCode();
+            hash = (hash * 7) + Date.GetHashCode();
+            return hash;
+        }
     }
 }
