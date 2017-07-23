@@ -53,7 +53,7 @@ namespace FourChins
         /// </summary>
         private void StartWork()
         {
-            logger.Info("Starting work");
+            logger.Info("Starting Crawl");
             BoardRootObject BoardsRootObject = FourChinCore.GetBoard();
 
             //for each board, parse it.
@@ -80,7 +80,7 @@ namespace FourChins
         /// <param name="board">Board to parse</param>
         public void ParseBoard(string board)
         {
-            logger.Info("Parsing board: " + board);
+            logger.Info("Crawling board: " + board);
             ulong lastCrawled = lastCrawledTracker.GetLastCrawledTimeFromBoard(board);
 
             //get all the threads from the passed in board
@@ -122,7 +122,7 @@ namespace FourChins
                             continue;
                         }
 
-                        logger.Debug(string.Format("Parsing Thread: {0} - Board: {1}", thread.ThreadNumber, board));
+                        logger.Debug(string.Format("Crawling Thread: {0} - Board: {1}", thread.ThreadNumber, board));
                         foreach (Post post in fullThread.Posts)
                         {
                             //for each post, check to see if the poster's name has their address
@@ -141,7 +141,7 @@ namespace FourChins
                     }
                     else
                     {
-                        logger.Debug(string.Format("Board [{0}] - Thread [{1}] has been parsed already", board, thread.ThreadNumber));
+                        logger.Debug(string.Format("Board [{0}] - Thread [{1}] has been crawled already", board, thread.ThreadNumber));
                     }
                 }
             }
