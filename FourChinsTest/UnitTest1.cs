@@ -9,15 +9,17 @@ namespace _4ChinsTest
         [TestMethod]
         public void TestGetsGetter()
         {
-            Assert.AreEqual(FourChins.FourChins.GetTheGet("1542215"), 1);
-            Assert.AreEqual(FourChins.FourChins.GetTheGet("1542211"), 2);
-            Assert.AreEqual(FourChins.FourChins.GetTheGet("1542000"), 3);
-            Assert.AreEqual(FourChins.FourChins.GetTheGet("1540000"), 4);
-            Assert.AreEqual(FourChins.FourChins.GetTheGet("1500000"), 5);
-            Assert.AreEqual(FourChins.FourChins.GetTheGet("1000000"), 6);
-            Assert.AreEqual(FourChins.FourChins.GetTheGet("0000000"), 7);
-            Assert.AreEqual(FourChins.FourChins.GetTheGet("00000000"), 8);
-            Assert.AreEqual(FourChins.FourChins.GetTheGet("000000000"), 9);
+            FourChins.FourChins fourchin = new FourChins.FourChins();
+
+            Assert.AreEqual(fourchin.GetTheGet("1542215"), 1);
+            Assert.AreEqual(fourchin.GetTheGet("1542211"), 2);
+            Assert.AreEqual(fourchin.GetTheGet("1542000"), 3);
+            Assert.AreEqual(fourchin.GetTheGet("1540000"), 4);
+            Assert.AreEqual(fourchin.GetTheGet("1500000"), 5);
+            Assert.AreEqual(fourchin.GetTheGet("1000000"), 6);
+            Assert.AreEqual(fourchin.GetTheGet("0000000"), 7);
+            Assert.AreEqual(fourchin.GetTheGet("00000000"), 8);
+            Assert.AreEqual(fourchin.GetTheGet("000000000"), 9);
         }
     }
 }
