@@ -65,8 +65,10 @@ namespace FourChins
                 {
                     SetLastRunTimeForBoard(board.BoardName);
                 }
-
-                ParseBoard(board.BoardName);
+                else
+                {
+                    ParseBoard(board.BoardName);
+                }                
             }
         }
 
